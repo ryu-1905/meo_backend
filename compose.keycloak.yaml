@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:17.5
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready -U $$DB_USER"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${BD_USER}
+      POSTGRES_PASSWORD: ${BD_PASSWORD}
+      POSTGRES_DB: keycloak
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - 5433:5432
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.3.2
+    restart: unless-stopped
+    command: start-dev
+    environment:
+      KC_HEALTH_ENABLED: true
+
+      KC_BOOTSTRAP_ADMIN_USERNAME: ${KEYCLOAK_USERNAME}
+      KC_BOOTSTRAP_ADMIN_PASSWORD: ${KEYCLOAK_PASSWORD}
+
+      KC_DB: postgres
+      KC_DB_USERNAME: ${BD_USER}
+      KC_DB_PASSWORD: ${BD_PASSWORD}
+      KC_DB_URL: jdbc:postgresql://${DB_HOST}:5432/keycloak
+    depends_on:
+      - postgres
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    ports:
+      - "8081:8080"
+
+volumes:
+  postgres-data:
