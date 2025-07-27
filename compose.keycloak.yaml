@@ -3,7 +3,7 @@ services:
     image: postgres:17.5
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "pg_isready -U $$DB_USER"]
+      test: ["CMD", "pg_isready -U $$DB_USER -d keycloak"]
       interval: 30s
       timeout: 10s
       retries: 5
