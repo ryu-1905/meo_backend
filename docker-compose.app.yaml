@@ -1,0 +1,21 @@
+services:
+  postgres-app:
+    image: postgres:17.5
+    container_name: postgres-app
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}", "-d", "${DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres-app:/var/lib/postgresql/data
+    ports:
+      - 5434:5432
+
+volumes:
+  postgres-app:
