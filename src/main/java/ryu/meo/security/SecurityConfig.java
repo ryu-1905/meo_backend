@@ -16,7 +16,10 @@ import org.springframework.security.web.authentication.logout.LogoutSuccessHandl
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
+import lombok.experimental.FieldDefaults;
 
 /**
  * Modification Logs:
@@ -27,49 +30,44 @@ import lombok.RequiredArgsConstructor;
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
 public class SecurityConfig {
 
-    @Value("${spring.security.cors.allowed-origins}")
-    private List<String> corsOrigins;
+        @Value("${spring.security.cors.allowed-origins}")
+        List<String> corsOrigins;
 
-    private final ClientRegistrationRepository clientRegistrationRepository;
-    private final AuthenticationSuccessHandler oAuth2SuccessHandler;
+        final ClientRegistrationRepository clientRegistrationRepository;
+        final AuthenticationSuccessHandler oAuth2SuccessHandler;
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
-        return httpSecurity
-                .authorizeHttpRequests(
-                        authorize -> authorize.requestMatchers("/oauth2/**", "/login/oauth2/code/**", "/public/**")
-                                .permitAll()
-                                .anyRequest().authenticated())
-                .oauth2Login(oauth2Login -> oauth2Login.successHandler(oAuth2SuccessHandler))
-                .oauth2Client(Customizer.withDefaults())
-                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
-                .logout(logout -> logout
-                        .logoutSuccessHandler(oidcLogoutSuccessHandler()))
-                .cors(Customizer.withDefaults())
-                .csrf(csrf -> csrf.disable())
-                .httpBasic(httpBasic -> httpBasic.disable())
-                .formLogin(formLogin -> formLogin.disable())
-                .build();
-    }
+        @Bean
+        public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+                return httpSecurity
+                                .authorizeHttpRequests(
+                                                authorize -> authorize
+                                                                .requestMatchers("/oauth2/**", "/login/oauth2/code/**",
+                                                                                "/user/access-token",
+                                                                                "/public/**")
+                                                                .permitAll()
+                                                                .anyRequest().authenticated())
+                                .oauth2Login(oauth2Login -> oauth2Login.successHandler(oAuth2SuccessHandler))
+                                .oauth2Client(Customizer.withDefaults())
+                                .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()))
+                                .cors(Customizer.withDefaults())
+                                .csrf(csrf -> csrf.disable())
+                                .httpBasic(httpBasic -> httpBasic.disable())
+                                .formLogin(formLogin -> formLogin.disable())
+                                .build();
+        }
 
-    @Bean
-    CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration corsConfiguration = new CorsConfiguration();
-        corsConfiguration.setAllowCredentials(corsOrigins.get(0).equals("*") ? false : true);
-        corsConfiguration.setAllowedOrigins(corsOrigins);
-        corsConfiguration.setAllowedMethods(List.of("*"));
-        corsConfiguration.setAllowedHeaders(List.of("*"));
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", corsConfiguration);
-        return source;
-    }
-
-    private LogoutSuccessHandler oidcLogoutSuccessHandler() {
-        OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler = new OidcClientInitiatedLogoutSuccessHandler(
-                clientRegistrationRepository);
-
-        return oidcLogoutSuccessHandler;
-    }
+        @Bean
+        public CorsConfigurationSource corsConfigurationSource() {
+                CorsConfiguration corsConfiguration = new CorsConfiguration();
+                corsConfiguration.setAllowCredentials(corsOrigins.get(0).equals("*") ? false : true);
+                corsConfiguration.setAllowedOrigins(corsOrigins);
+                corsConfiguration.setAllowedMethods(List.of("*"));
+                corsConfiguration.setAllowedHeaders(List.of("*"));
+                UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+                source.registerCorsConfiguration("/**", corsConfiguration);
+                return source;
+        }
 }

@@ -3,12 +3,15 @@ package ryu.meo.security;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneId;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.oauth2.core.OAuth2AccessToken;
+import org.springframework.security.oauth2.core.OAuth2RefreshToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -41,11 +44,17 @@ public class OAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 OAuth2AuthorizedClient client = authorizedClientService.loadAuthorizedClient(
                                 oauthToken.getAuthorizedClientRegistrationId(),
                                 oauthToken.getName());
-                String accessToken = client.getAccessToken().getTokenValue();
-
+                OAuth2AccessToken accessToken = client.getAccessToken();
+                OAuth2RefreshToken refreshToken = client.getRefreshToken();
                 response.sendRedirect(
                                 redirectFrontendUri + "?token="
-                                                + URLEncoder.encode(accessToken, StandardCharsets.UTF_8));
+                                                + URLEncoder.encode(accessToken.getTokenValue(), StandardCharsets.UTF_8)
+                                                + "&refresh-token="
+                                                + URLEncoder.encode(refreshToken.getTokenValue(),
+                                                                StandardCharsets.UTF_8)
+                                                + "&access-token-expires-at="
+                                                + URLEncoder.encode(accessToken.getExpiresAt().atZone(ZoneId.of("UTC"))
+                                                                .toString(), StandardCharsets.UTF_8));
         }
 
 }
