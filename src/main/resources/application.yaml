@@ -26,7 +26,8 @@ spring:
             redirect-frontend-uri: ${REDIRECT_FRONTEND_URI}
         provider:
           keycloak:
-            issuer-uri: ${KEY_CLOAK_URL}
+            issuer-uri: ${KEY_CLOAK_ISSUER_URL}
       resourceserver:
         jwt:
-          issuer-uri: ${KEY_CLOAK_URL}
+          issuer-uri: ${KEY_CLOAK_ISSUER_URL}
+          admin-uri: ${KEY_CLOAK_ADMIN_URL}

@@ -1,4 +1,4 @@
-package ryu.meo.dto;
+package ryu.meo.dto.request;
 
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -8,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
-public class RefreshTokenDTO {
-    String refreshToken;
+public class UpdateUserInfoRequestDTO {
+    String email;
+    String nickName;
 }
