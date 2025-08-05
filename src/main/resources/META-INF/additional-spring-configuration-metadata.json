@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "spring.security.cors.allowed-origins",
+      "type": "java.util.List"
+    },
+    {
+      "name": "spring.security.oauth2.client.registration.keycloak.redirect-frontend-uri",
+      "type": "java.lang.String"
+    },
+    {
+      "name": "spring.security.oauth2.resourceserver.jwt.admin-uri",
+      "type": "java.lang.String"
+    }
+  ]
+}

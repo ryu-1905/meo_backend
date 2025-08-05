@@ -4,11 +4,30 @@ spring:
   config:
     import: file:.env[.properties]
   datasource:
-    url: jdbc:postgresql://${DB_HOST}:5432/${POSTGRES_DB}
-    username: ${POSTGRES_USER}
-    password: ${POSTGRES_PASSWORD}
+    url: jdbc:postgresql://localhost:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+  security:
+    cors:
+      allowed-origins: ${CORS_ORIGINS}
+    oauth2:
+      client:
+        registration:
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            scope: openid, profile, email
+            redirect-frontend-uri: ${REDIRECT_FRONTEND_URI}
+        provider:
+          keycloak:
+            issuer-uri: ${KEY_CLOAK_ISSUER_URL}
+      resourceserver:
+        jwt:
+          issuer-uri: ${KEY_CLOAK_ISSUER_URL}
+          admin-uri: ${KEY_CLOAK_ADMIN_URL}
